@@ -3,8 +3,11 @@
  */
 
 let frontier = [];
+let edge = [];
 
 let history = new Set();
+
+let FILL;
 
 function checkPixel(map, p) {
   // https://p5js.org/reference/#/p5/pixels
@@ -21,17 +24,23 @@ function checkPixel(map, p) {
   _a = map.pixels[idx + 3];
   isEmpty = (_r == 0 && _g == 0 && _b == 0);
 
+  if (isEmpty) {
+    map.set(p.x, p.y, FILL);
+    frontier.push(p);
+  } else {
+    edge.push(p);
+  }
 }
 
 function floodFill(map, p) {
   print("Start Flood Fill");
-  FILL = color(255, 127, 0);
+  FILL = color(255);
   frontier = [];
+  edge = [];
   frontier.push(p);
 
-  map.stroke(255);
-  map.strokeWeight(5);
-  map.fill(255, 127, 0);
+  map.stroke(FILL);
+  map.strokeWeight(STROKE_WEIGHT/2);
 
   history.clear();
   history.add(p);
@@ -39,31 +48,18 @@ function floodFill(map, p) {
   map.loadPixels();
 
   while (frontier.length) {
-    p = frontier.pop()
+    p = frontier.pop();
 
-    p2 = new Point(p.x + 1, p.y);
-    if (checkPixel(map, p2)) {
-      map.set(p2.x, p2.y, FILL);
-      frontier.push(p2);
-    }
-    p2 = new Point(p.x - 1, p.y);
-    if (checkPixel(map, p2)) {
-      map.set(p2.x, p2.y, FILL);
-      frontier.push(p2);
-    }
-    p2 = new Point(p.x, p.y + 1);
-    if (checkPixel(map, p2)) {
-      map.set(p2.x, p2.y, FILL);
-      frontier.push(p2);
-    }
-    p2 = new Point(p.x, p.y - 1);
-    if (checkPixel(map, p2)) {
-      map.set(p2.x, p2.y, FILL);
-      frontier.push(p2);
-    }    
+    checkPixel(map, new Point(p.x + 1, p.y    ));
+    checkPixel(map, new Point(p.x - 1, p.y    ));
+    checkPixel(map, new Point(p.x    , p.y + 1));
+    checkPixel(map, new Point(p.x    , p.y - 1));
   }
   
   map.updatePixels();
-
+  
+  // fill in the edge
+  edge.forEach(e => map.point(e.x, e.y));
+  
   print("Finish Flood Fill");
 }
