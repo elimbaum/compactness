@@ -10,9 +10,9 @@ class Point {
   
   toString() {
     return `(${this.x},${this.y})`;
-   }
+  }
    
-   toKey() {
+  toKey() {
      return this.x + "_" + this.y;
-   }
+  }
 }

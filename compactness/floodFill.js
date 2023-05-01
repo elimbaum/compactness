@@ -12,72 +12,58 @@ function checkPixel(map, p) {
     return false;
   }
   history.add(p.toKey());
-  
+
   idx = 4 * (p.y * PIXEL_DENSITY * width * PIXEL_DENSITY + p.x * PIXEL_DENSITY);
 
   _r = map.pixels[idx];
   _b = map.pixels[idx + 1];
   _g = map.pixels[idx + 2];
   _a = map.pixels[idx + 3];
-  isEmpty = (_r == 0 && _g == 0 && _b == 0); 
+  isEmpty = (_r == 0 && _g == 0 && _b == 0);
 
-  if (isEmpty) {
-    map.point(p.x, p.y);
-    frontier.push(p);
-  }
 }
 
 function floodFill(map, p) {
+  print("Start Flood Fill");
+  FILL = color(255, 127, 0);
   frontier = [];
-  const FILL = color(127, 255, 0);
-  
+  frontier.push(p);
+
   map.stroke(255);
-  map.strokeWeight(1);
+  map.strokeWeight(5);
   map.fill(255, 127, 0);
 
   history.clear();
   history.add(p);
 
-  frontier.push(p);
   map.loadPixels();
 
   while (frontier.length) {
-    p = frontier.pop();
-    print(p.x, p.y);
-    //print(history);
+    p = frontier.pop()
 
-    checkPixel(map, new Point(p.x + 1, p.y));
-    checkPixel(map, new Point(p.x - 1, p.y));
-    checkPixel(map, new Point(p.x, p.y + 1));
-    checkPixel(map, new Point(p.x, p.y - 1));
-    
-    map.rect(p.x, p.y, 2, 2);
-
-    //p2 = new Point(p.x + 1, p.y);
-    //if (checkPixel(map, p2)) {
-    //  map.point(p2.x, p2.y);
-    //  frontier.push(p2);
-    //}
-    
-    //p2 = new Point(p.x - 1, p.y);
-    //if (checkPixel(map, p2)) {
-    //  map.point(p2.x, p2.y);
-    //  frontier.push(p2);
-    //}
-    
-    //p2 = new Point(p.x, p.y + 1);
-    //if (checkPixel(map, p2)) {
-    //  map.point(p2.x, p2.y);
-    //  frontier.push(p2);
-    //}
-    
-    //p2 = new Point(p.x, p.y - 1);
-    //if (checkPixel(map, p2)) {
-    //  map.point(p2.x, p2.y);
-    //  frontier.push(p2);
-    //}
-    
-    map.updatePixels();
+    p2 = new Point(p.x + 1, p.y);
+    if (checkPixel(map, p2)) {
+      map.set(p2.x, p2.y, FILL);
+      frontier.push(p2);
+    }
+    p2 = new Point(p.x - 1, p.y);
+    if (checkPixel(map, p2)) {
+      map.set(p2.x, p2.y, FILL);
+      frontier.push(p2);
+    }
+    p2 = new Point(p.x, p.y + 1);
+    if (checkPixel(map, p2)) {
+      map.set(p2.x, p2.y, FILL);
+      frontier.push(p2);
+    }
+    p2 = new Point(p.x, p.y - 1);
+    if (checkPixel(map, p2)) {
+      map.set(p2.x, p2.y, FILL);
+      frontier.push(p2);
+    }    
   }
   
+  map.updatePixels();
+
+  print("Finish Flood Fill");
 }

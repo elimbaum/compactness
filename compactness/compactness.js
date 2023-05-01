@@ -1,5 +1,5 @@
 const STROKE_WEIGHT = 10;
-const PIXEL_DENSITY = 1;
+const PIXEL_DENSITY = 2;
 
 let map;
 
@@ -20,6 +20,9 @@ function setup() {
   textSize(16);
 
   setupFormat();
+  
+  //map.drawingContext.imageSmoothingEnabled = false;
+  //drawingContext.imageSmoothingEnabled = false;
 }
 
 let lastP = null;
