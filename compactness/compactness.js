@@ -1,26 +1,28 @@
 const STROKE_WEIGHT = 10;
 const PIXEL_DENSITY = 2;
 
+const DEFAULT_FILL = 127;
+
 let map;
 
 function setupFormat() {
-  map.stroke(255);
+  map.stroke(DEFAULT_FILL);
   map.strokeWeight(STROKE_WEIGHT);
 }
 
 function setup() {
   createCanvas(windowWidth, windowHeight);
   pixelDensity(PIXEL_DENSITY);
-  
+
   map = createGraphics(windowWidth, windowHeight);
   map.pixelDensity(PIXEL_DENSITY);
 
   map.background(0);
-  fill(255);
+  fill(DEFAULT_FILL);
   textSize(16);
 
   setupFormat();
-  
+
   //map.drawingContext.imageSmoothingEnabled = false;
   //drawingContext.imageSmoothingEnabled = false;
 }
@@ -63,16 +65,17 @@ function mouseClicked() {
 
 let ERASE_KEY = 'x';
 let FILL_KEY = 'f';
+let CALC_KEY = 'c';
 
 function keyPressed() {
   if (key == ERASE_KEY) {
     map.background(0);
     isDrawing = false;
-    return;
-  }
-  
-  if (key == FILL_KEY) {
+  } else if (key == FILL_KEY) {
     floodFill(map, new Point(mouseX, mouseY));
-    setupFormat();
+  } else if (key == CALC_KEY) {
+    calculate(map, new Point(mouseX, mouseY));
   }
+
+  setupFormat();
 }
