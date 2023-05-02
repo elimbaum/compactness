@@ -31,10 +31,10 @@ function checkPixel(map, p) {
   _b = map.pixels[idx + 1];
   _g = map.pixels[idx + 2];
   _a = map.pixels[idx + 3];
-  isEmpty = (isNear(_r, 0, COLOR_LIMIT) && 
-              isNear(_g, 0, COLOR_LIMIT) &&
-              isNear(_b, 0, COLOR_LIMIT));
-              
+  isEmpty = (isNear(_r, 0, COLOR_LIMIT) &&
+    isNear(_g, 0, COLOR_LIMIT) &&
+    isNear(_b, 0, COLOR_LIMIT));
+
   if (isEmpty) {
     map.set(p.x, p.y, DEFAULT_FILL);
     frontier.push(p);
@@ -56,9 +56,9 @@ function checkFilled(map, p) {
   _b = map.pixels[idx + 1];
   _g = map.pixels[idx + 2];
   _a = map.pixels[idx + 3];
-  isFilled = (isNear(_r, DEFAULT_FILL, COLOR_LIMIT) && 
-              isNear(_g, DEFAULT_FILL, COLOR_LIMIT) &&
-              isNear(_b, DEFAULT_FILL, COLOR_LIMIT));
+  isFilled = (isNear(_r, DEFAULT_FILL, COLOR_LIMIT) &&
+    isNear(_g, DEFAULT_FILL, COLOR_LIMIT) &&
+    isNear(_b, DEFAULT_FILL, COLOR_LIMIT));
 
   if (isFilled) {
     count += 1;
@@ -95,18 +95,79 @@ function floodFill(map, p) {
 
   // fill in the edge
   edge.forEach(e => map.point(e.x, e.y));
-  edge = []
+  edge = [];
 
-    print("Finish Flood Fill");
+  print("Finish Flood Fill");
 }
 
-function computePerimeter(edge) { 
+function computePerimeter(edge) {
   // sort by x
   edge.sort((a, b) => (a.x - b.x));
-  
+
   print(edge);
+
+  history.clear();
+
+  perim = 0;
   
-  return edge.length;
+  let start = edge[0];
+  let last = [];
+  
+  let i = 0;
+  let p;
+  while (true) {
+    p = edge[i];
+    if (!p) { break; }
+    
+    true_dist = 0;
+    history.add(p.toKey());
+    // p's next neighbor must be either (-1, 0, +1) in each direction: check both sides
+    // in the array
+    offset = 1;
+    while (abs(offset) < edge.length) {
+      _offset = offset;
+      offset = -offset;
+      if (offset > 0) {
+        offset += 1;
+      }
+
+      q = edge[i + _offset];
+      if (!q) {
+        continue;
+      }
+      if (history.has(q.toKey())) {
+        continue;
+      }
+
+      d = p.oneAxisDistance(q);
+      //print(p, q, d)
+      if (d > 1) {
+        continue;
+      }
+      if (d == 1) {
+        true_dist = p.cartesianDist(q);
+        perim += true_dist;  
+        //print(`${p} -> ${q} (d ${d}, ${true_dist}) [p ${perim}]`)
+        break;
+      }
+    }
+    if (! true_dist) {
+      // no neighbors found. either an issue or we're done.
+      if (p.cartesianDist(start) < 2) {
+        return perim;
+      }
+      print("WARNING: no neighbor for", p);
+      i = last.pop();
+      cornerError = p;
+      //showStats = false;
+      continue;
+    }
+    // last good one
+    last.push(i);
+    i += _offset;
+  }
+
+  return perim;
 }
 
 function calculate(map, p) {
@@ -135,9 +196,10 @@ function calculate(map, p) {
 
   print("count", count);
   //print("edge", edge);
-  perimeter = computePerimeter(edge)
+  perimeter = computePerimeter(edge);
   compactness = (4 * PI * count) / (perimeter * perimeter);
   print("shitty compactness", compactness);
+  print("perim", perimeter, "edge len", edge.length);
 
   return edge;
 }

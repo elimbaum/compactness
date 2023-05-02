@@ -11,7 +11,7 @@ function setupFormat() {
 }
 
 function setup() {
-  createCanvas(canvasWidth, canvasHeight);
+  createCanvas(windowWidth, windowHeight);
   pixelDensity(PIXEL_DENSITY);
 
   map = createGraphics(width, height);
@@ -33,6 +33,10 @@ let isCalculating = false;
 
 let showStats = false;
 
+let cornerError = null;
+
+let startup = true;
+
 function getStatusText() {
   s = "";
   if (isDrawing) {
@@ -48,6 +52,22 @@ function getStatusText() {
   if (showStats) {
     c = compactness;
     s += `\narea: ${count}\nperim: ${perimeter.toFixed(2)}\nc: ${c.toFixed(2)}\n1/c: ${(1/c).toFixed(2)}`
+  }
+
+  if (!!cornerError) {
+    s += "\nerror! try fixing the corner."
+  }
+  
+  if (startup) {
+    kbd = [
+      "",
+      "instructions",
+      "click: draw/stop drawing",
+      "X: erase",
+      "F: flood fill",
+      "C: calculate!"
+    ]
+    s += "\n" + kbd.join("\n");
   }
 
   return s;
@@ -73,9 +93,20 @@ function draw() {
   stroke('red');
   edge.forEach(e => point(e.x, e.y));
   pop();
+
+  if (!!cornerError) {
+    push();
+    stroke('cyan');
+    strokeWeight(5);
+    point(cornerError.x, cornerError.y);
+    pop();
+  }
+
 }
 
 function mouseClicked() {
+  startup = false;
+  cornerError = false;
   isDrawing = ! isDrawing;
   if (isDrawing) {
     lastP = new Point(mouseX, mouseY);
@@ -88,6 +119,8 @@ let CALC_KEY = 'c';
 let INSPECT_KEY = 'i';
 
 function keyPressed() {
+  startup = false;
+  cornerError = false;
   if (key == ERASE_KEY) {
     showStats = false;
     map.background(0);
@@ -98,9 +131,9 @@ function keyPressed() {
     floodFill(map, new Point(mouseX, mouseY));
   } else if (key == CALC_KEY) {
     isCalculating = true;
+    showStats = true;
     calculate(map, new Point(mouseX, mouseY));
     isCalculating = false;
-    showStats = true;
   } else if (key == INSPECT_KEY) {
     x = mouseX;
     y = mouseY;
