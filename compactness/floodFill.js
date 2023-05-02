@@ -198,7 +198,7 @@ function calculate(map, p) {
   //print("edge", edge);
   perimeter = computePerimeter(edge);
   compactness = (4 * PI * count) / (perimeter * perimeter);
-  print("shitty compactness", compactness);
+  print("compactness", compactness);
   print("perim", perimeter, "edge len", edge.length);
 
   return edge;
