@@ -9,7 +9,7 @@ instructions are included, but basics:
 - `f` for flood fill (under mouse - should be an empty region)
 - `c` to calculate compactness
 
-live demo: [elibaum.com/compactness](elibaum.com/compactness)
+live demo: [elibaum.com/compactness](https://elibaum.com/compactness)
 
 more info: [wikipedia](https://en.wikipedia.org/wiki/Compactness_measure_of_a_shape)
 
