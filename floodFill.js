@@ -186,8 +186,8 @@ function calculate(map, p) {
   while (frontier.length) {
     p = frontier.pop();
 
-    checkFilled(map, new Point(p.x + 1, p.y    ));
-    checkFilled(map, new Point(p.x - 1, p.y    ));
+    checkFilled(map, new Point(p.x + 1, p.y));
+    checkFilled(map, new Point(p.x - 1, p.y));
     checkFilled(map, new Point(p.x, p.y + 1));
     checkFilled(map, new Point(p.x, p.y - 1));
   }
