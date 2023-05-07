@@ -29,6 +29,7 @@ function setup() {
 
 let lastP = null;
 let isDrawing = false;
+let isErasing = false;
 let isCalculating = false;
 
 let showStats = false;
@@ -41,6 +42,8 @@ function getStatusText() {
   s = "";
   if (isDrawing) {
     s += "drawing";
+  } else if (isErasing) {
+    s += "erasing";
   } else {
     s += "viewing";
   }
@@ -55,38 +58,50 @@ function getStatusText() {
   }
 
   if (!!cornerError) {
-    s += "\nerror! try fixing the corner."
-  }
-  
-  if (startup) {
-    kbd = [
-      "",
-      "instructions",
-      "click: draw/stop drawing",
-      "X: erase",
-      "F: flood fill",
-      "C: calculate!"
-    ]
-    s += "\n" + kbd.join("\n");
+    s += "\nwarning! try fixing the corner."
   }
 
   return s;
 }
 
+function draw_help_text() {
+    kbd = [
+      "instructions",
+      "",
+      "click: draw/stop drawing",
+      "Q: erase entire screen",
+      "E: erase tool",
+      "F: flood fill under mouse",
+      "C: calculate compactness under mouse",
+    ];
+    
+    text("\n" + kbd.join("\n"), 10, height - 16 * 1.5 * kbd.length);
+}
+
 function draw() {
   background(0);
 
-  if (isDrawing) {
+  if (isDrawing || isErasing) {
     //showStats = false;
     let p = new Point(mouseX, mouseY);
     if (lastP != p) {
+      map.push();
+      if (isErasing) {
+        map.stroke(0);
+      }
       map.line(lastP.x, lastP.y, p.x, p.y);
+      map.pop();
       lastP = p;
     }
   }
 
   image(map, 0, 0, width, height);
+  
+  push();
+  fill(255);
   text(getStatusText(), 10, 20);
+  draw_help_text();
+  pop();
   
   push();
   strokeWeight(2);
@@ -105,27 +120,39 @@ function draw() {
 }
 
 function mouseClicked() {
-  startup = false;
+  if (isErasing) {
+    isDrawing = false;
+  } else {
+     isDrawing = ! isDrawing;
+  }
+  
+  isErasing = false;
   cornerError = false;
-  isDrawing = ! isDrawing;
+  
   if (isDrawing) {
     lastP = new Point(mouseX, mouseY);
   }
 }
 
-let ERASE_KEY = 'x';
+let ERASE_SCREEN_KEY = 'q';
+let ERASE_KEY = 'e';
 let FILL_KEY = 'f';
 let CALC_KEY = 'c';
 let INSPECT_KEY = 'i';
 
 function keyPressed() {
-  startup = false;
   cornerError = false;
-  if (key == ERASE_KEY) {
+  isErasing = false;
+  
+  if (key == ERASE_SCREEN_KEY) {
     showStats = false;
     map.background(0);
     edge = [];
     isDrawing = false;
+  } else if (key == ERASE_KEY) {
+    lastP = lastP = new Point(mouseX, mouseY);
+    isErasing = true;
+    isDrawing = false
   } else if (key == FILL_KEY) {
     //showStats = false;
     floodFill(map, new Point(mouseX, mouseY));
